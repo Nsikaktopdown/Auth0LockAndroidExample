@@ -1,15 +1,25 @@
 package com.nsikakthompson.auth0lockandroidexample;
 
+import android.app.Dialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+
+import com.auth0.android.Auth0;
+import com.auth0.android.authentication.AuthenticationException;
+import com.auth0.android.provider.AuthCallback;
+import com.auth0.android.provider.WebAuthProvider;
+import com.auth0.android.result.Credentials;
 
 public class MainActivity extends AppCompatActivity {
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +36,41 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+
+        //instantiate Auth0
+        Auth0 auth0 = new Auth0(getString(R.string.auth_client_id), getString(R.string.com_auth0_domain));
+
+        //Configure the account in OIDC conformant mode
+        auth0.setOIDCConformant(true);
+
+        WebAuthProvider.init(auth0)
+                .withScheme("demo")
+                .withAudience(String.format("https://%s/userinfo", getString(R.string.com_auth0_domain)))
+                .start(MainActivity.this, new AuthCallback() {
+                    @Override
+                    public void onFailure(@NonNull Dialog dialog) {
+                        // Show error Dialog to user
+                    }
+
+                    @Override
+                    public void onFailure(AuthenticationException exception) {
+                        // Show error to user
+                    }
+
+                    @Override
+                    public void onSuccess(@NonNull Credentials credentials) {
+                        // Store credentials
+                        // Navigate to your main activity
+                    }
+                });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+
     }
 
     @Override
